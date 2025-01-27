@@ -1,8 +1,8 @@
 # Desafío Técnico para postulantes a Desarrolladores Fullstack
+![Status](https://img.shields.io/badge/Lifecycle-active-green)&nbsp; ![Release](https://img.shields.io/badge/Release-v1.0.0-purple)&nbsp; [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Objetivos
-
-Este desafío tiene como objetivo evaluar tus habilidades como desarrollador Fullstack, especialmente en Java, Spring Boot, Node.js, React, y principios de desarrollo de software. 
+>Este desafío tiene como objetivo evaluar tus habilidades como desarrollador Fullstack, especialmente en Java, Spring Boot, Node.js, React, y principios de desarrollo de software. 
 
 ## Requerimiento
 
@@ -49,6 +49,3 @@ Esta prueba consiste en desarrollar un mantenedor de usuarios simple por medio d
 - **Repositorio Git**: Envía tu desafío como un Pull Request a este repositorio indicando tu nombre, correo y cargo al que postulas. Todos los PR serán rechazados, no es un indicador de la prueba.
 - **Instrucciones de Ejecución**: Incluir un archivo `INSTRUCTIONS.md` con las instrucciones necesarias para ejecutar tanto el backend como el frontend o como los contenedores como Docker/Docker Compose si fueran empleados. Considere que no se utilizan IDEs para la revisión de los desafíos, por lo que las instrucciones deberán ser enfocadas para un entorno de ambiente pre productivo (terminal/consola).
 - **Documentación OpenAPI**: En el repositorio, debe incluir un archivo `openapi.yaml` con el diseño de la API de usuarios.
-
-## Licencia
-Apache 2
