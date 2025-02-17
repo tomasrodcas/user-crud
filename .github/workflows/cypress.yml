@@ -1,0 +1,86 @@
+name: Run Cypress Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cypress-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      backend:
+        image: openjdk:17
+        ports:
+          - 8080:8080
+        options: >-
+          --health-cmd "curl --fail http://localhost:8080/actuator/health || exit 1"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 10
+
+      frontend:
+        image: node:18
+        ports:
+          - 5173:5173
+        options: >-
+          --health-cmd "curl --fail http://localhost:5173 || exit 1"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js and PNPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "pnpm"
+
+      - name: Install PNPM
+        run: corepack enable && corepack prepare pnpm@latest --activate
+
+      - name: Install frontend dependencies with PNPM
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Start frontend server
+        working-directory: frontend
+        run: pnpm dev &
+
+      - name: Set up JDK for backend
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 17
+
+      - name: Build and run backend
+        working-directory: backend
+        run: |
+          mvn clean package -DskipTests
+          java -jar target/*.jar &
+
+      - name: Wait for services to be ready
+        run: sleep 20 # Adjust if needed
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v5
+        with:
+          start: pnpm dev
+          wait-on: "http://localhost:5173 http://localhost:8080"
+          browser: chrome
+          headed: false
+          config-file: frontend/cypress.config.ts
+
+      - name: Upload Cypress test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-results
+          path: frontend/cypress/results
