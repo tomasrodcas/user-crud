@@ -1,6 +1,6 @@
 FROM node:18
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN npm install -g pnpm && pnpm --version
 
 WORKDIR /app
 

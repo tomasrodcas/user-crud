@@ -8,7 +8,6 @@ const getEnvVariable = (key: string, defaultValue?: string): string => {
   
   export const config = {
     API_BASE_URL: getEnvVariable("VITE_API_BASE_URL"),
-    ENV: getEnvVariable("VITE_ENV", "development"), // Default to "development"
-    FEATURE_FLAG: getEnvVariable("VITE_FEATURE_FLAG", "false") === "true",
+    ENV: getEnvVariable("VITE_ENV", "development"),
   };
   

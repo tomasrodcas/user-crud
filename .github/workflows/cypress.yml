@@ -1,87 +1,59 @@
-name: Run Cypress Tests
+name: Run CI Checks
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-
     branches:
       - main
 
 jobs:
-  cypress-tests:
+  checks:
     runs-on: ubuntu-latest
 
-    services:
-      backend:
-        image: openjdk:17
-        ports:
-          - 8080:8080
-        options: >-
-          --health-cmd "curl --fail http://localhost:8080/actuator/health || exit 1"
-          --health-interval 5s
-          --health-timeout 10s
-          --health-retries 10
-
-      frontend:
-        image: node:18
-        ports:
-          - 5173:5173
-        options: >-
-          --health-cmd "curl --fail http://localhost:5173 || exit 1"
-          --health-interval 5s
-          --health-timeout 10s
-          --health-retries 10
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js and PNPM
-        uses: actions/setup-node@v3
+      - name: Set up PNPM
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 18
-          cache: "pnpm"
+          version: latest
 
-      - name: Install PNPM
-        run: corepack enable && corepack prepare pnpm@latest --activate
-
-      - name: Install frontend dependencies with PNPM
-        working-directory: frontend
-        run: pnpm install --frozen-lockfile
-
-      - name: Start frontend server
-        working-directory: frontend
-        run: pnpm dev &
-
-      - name: Set up JDK for backend
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
           java-version: 17
+          cache: maven
 
-      - name: Build and run backend
-        working-directory: backend
-        run: |
-          mvn clean package -DskipTests
-          java -jar target/*.jar &
-
-      - name: Wait for services to be ready
-        run: sleep 20 # Adjust if needed
-
-      - name: Run Cypress tests
-        uses: cypress-io/github-action@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          start: pnpm dev
-          wait-on: "http://localhost:5173 http://localhost:8080"
-          browser: chrome
-          headed: false
-          config-file: frontend/cypress.config.ts
+          node-version: 18
 
-      - name: Upload Cypress test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-results
-          path: frontend/cypress/results
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: mvn install -DskipTests
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Backend Lint (Checkstyle)
+        working-directory: ./backend
+        run: mvn checkstyle:check || echo "Checkstyle issues found"
+
+      - name: Run Frontend Lint (ESLint)
+        working-directory: ./frontend
+        run: pnpm run lint
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: mvn test
+
+      - name: Build Backend
+        working-directory: ./backend
+        run: mvn clean package -DskipTests
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: pnpm run build

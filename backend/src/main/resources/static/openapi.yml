@@ -1,22 +1,22 @@
 openapi: 3.0.3
 info:
-  title: User Management API
-  description: API for managing users with full CRUD functionality.
+  title: API de Usuarios
+  description: API para gestionar usuarios, incluyendo creación, actualización, eliminación y consulta.
   version: 1.0.0
+
 servers:
-  - url: http://localhost:8080
-    description: Local development server
+  - url: http://localhost:8080/api/v1
+    description: Servidor local de desarrollo
 
 paths:
-  /api/users:
+  /users:
     get:
-      summary: Get all users
-      operationId: getAllUsers
-      tags:
-        - Users
+      summary: Obtener todos los usuarios
+      description: Retorna una lista de todos los usuarios registrados.
+      operationId: obtenerUsuarios
       responses:
         "200":
-          description: List of all users
+          description: Lista de usuarios obtenida exitosamente.
           content:
             application/json:
               schema:
@@ -25,12 +25,10 @@ paths:
                   $ref: "#/components/schemas/UserDTO"
 
     post:
-      summary: Create a new user
-      operationId: createUser
-      tags:
-        - Users
+      summary: Crear un usuario
+      description: Crea un nuevo usuario en el sistema.
+      operationId: crearUsuario
       requestBody:
-        description: User details
         required: true
         content:
           application/json:
@@ -38,61 +36,72 @@ paths:
               $ref: "#/components/schemas/UserRequestDTO"
       responses:
         "201":
-          description: User successfully created
+          description: Usuario creado exitosamente.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDTO"
         "400":
-          description: Validation error
+          description: Error de validación en los datos proporcionados.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: "#/components/schemas/ValidationError"
+        "409":
+          description: Ya existe un usuario con este correo electrónico o número de identificación.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Ya existe un usuario con este correo electrónico o número de identificación."
 
-  /api/users/{id}:
+  /users/{id}:
     get:
-      summary: Get a user by ID
-      operationId: getUserById
-      tags:
-        - Users
+      summary: Obtener un usuario por ID
+      description: Retorna los datos de un usuario específico basado en su ID.
+      operationId: obtenerUsuarioPorId
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID of the user
+          description: ID único del usuario
           schema:
             type: string
             format: uuid
       responses:
         "200":
-          description: User found
+          description: Datos del usuario obtenidos exitosamente.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDTO"
         "404":
-          description: User not found
+          description: Usuario no encontrado.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Usuario no encontrado."
 
     put:
-      summary: Update an existing user
-      operationId: updateUser
-      tags:
-        - Users
+      summary: Actualizar un usuario
+      description: Modifica los datos de un usuario existente.
+      operationId: actualizarUsuario
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID of the user to update
+          description: ID único del usuario
           schema:
             type: string
             format: uuid
       requestBody:
-        description: Updated user details
         required: true
         content:
           application/json:
@@ -100,46 +109,58 @@ paths:
               $ref: "#/components/schemas/UserRequestDTO"
       responses:
         "200":
-          description: User successfully updated
+          description: Usuario actualizado exitosamente.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDTO"
         "400":
-          description: Validation error
+          description: Error de validación en los datos proporcionados.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: "#/components/schemas/ValidationError"
         "404":
-          description: User not found
+          description: Usuario no encontrado.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Usuario no encontrado."
 
     delete:
-      summary: Delete a user
-      operationId: deleteUser
-      tags:
-        - Users
+      summary: Eliminar un usuario
+      description: Elimina un usuario del sistema.
+      operationId: eliminarUsuario
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID of the user to delete
+          description: ID único del usuario
           schema:
             type: string
             format: uuid
       responses:
-        "204":
-          description: User successfully deleted (No Content)
-        "404":
-          description: User not found
+        "200":
+          description: Usuario eliminado exitosamente.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: boolean
+                example: true
+        "404":
+          description: Usuario no encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Usuario no encontrado."
 
 components:
   schemas:
@@ -149,68 +170,62 @@ components:
         id:
           type: string
           format: uuid
-          example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-        firstName:
+          description: Identificador único del usuario.
+        firstNames:
           type: string
-          example: "John"
-        lastName:
+          description: Nombres del usuario.
+        lastNames:
           type: string
-          example: "Doe"
-        nationalId:
+          description: Apellidos del usuario.
+        rutNumber:
           type: integer
           format: int64
-          example: 12345678
+          description: Número de RUT del usuario.
         verificationDigit:
           type: string
-          example: "K"
+          description: Dígito verificador del RUT.
         birthDate:
           type: string
           format: date
-          example: "1990-01-01"
+          description: Fecha de nacimiento del usuario.
         email:
           type: string
           format: email
-          example: "john.doe@example.com"
+          description: Correo electrónico del usuario.
 
     UserRequestDTO:
       type: object
-      required:
-        - firstName
-        - lastName
-        - nationalId
-        - verificationDigit
-        - birthDate
-        - email
-        - password
       properties:
-        firstName:
+        firstNames:
           type: string
-          example: "John"
-        lastName:
+          description: Nombres del usuario.
+        lastNames:
           type: string
-          example: "Doe"
-        nationalId:
+          description: Apellidos del usuario.
+        rutNumber:
           type: integer
           format: int64
-          example: 12345678
+          description: Número de RUT del usuario.
         verificationDigit:
           type: string
-          example: "K"
+          description: Dígito verificador del RUT.
         birthDate:
           type: string
           format: date
-          example: "1990-01-01"
+          description: Fecha de nacimiento del usuario.
         email:
           type: string
           format: email
-          example: "john.doe@example.com"
-        password:
-          type: string
-          example: "securepass"
+          description: Correo electrónico del usuario.
 
-    ErrorResponse:
+    ValidationError:
       type: object
+      description: Detalles de errores de validación de entrada.
       properties:
-        error:
-          type: string
-          example: "User not found"
+        errores:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            firstNames: "El campo no puede estar vacío."
+            email: "Debe ser un correo electrónico válido."

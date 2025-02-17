@@ -19,13 +19,14 @@ public class SecurityConfig {
         return http
                 .cors(cors -> cors.configurationSource(corsFilter()))
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions().disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/api-docs/**",
-                                "/openapi.yml"
+                                "/h2-console/**"
                         ).permitAll()
                         .requestMatchers("/api/v1/users/**").permitAll()
                         .anyRequest().authenticated()
@@ -37,7 +38,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173", "https://yourfrontend.com", "*"));
+        config.setAllowedOrigins(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         source.registerCorsConfiguration("/**", config);
