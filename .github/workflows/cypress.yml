@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+
     branches:
       - main
 
@@ -80,7 +81,7 @@ jobs:
 
       - name: Upload Cypress test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-results
           path: frontend/cypress/results
