@@ -1,6 +1,33 @@
 # Desafío Técnico para postulantes a Desarrolladores Fullstack
 ![Status](https://img.shields.io/badge/Lifecycle-active-green)&nbsp; ![Release](https://img.shields.io/badge/Release-v1.0.0-purple)&nbsp; [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+## Consideraciones
+
+Existen una gran cantidad de mejoras y comportamientos que haria de una forma mas prolija, como el mamejo de errores, traducciones, las notificaciones y algunos estados de cargando... 
+
+Tambien hay algunas libertades que tome dentro de lo abierto de la tarea, como no listar ni crear passwords mediante formularios, sino que de forma
+automatica utilizando hashing seguro por detras. Esto en base a que 
+personalmente no encuentro recomendable que los admin generen passwords
+manualmente, sin embargo quizas falto una funcionalidad para regenerar,
+la funcion para que el usuario reciba la password por correo, el reset de esta con un codigo de seguridad temporal entre otros que probablemente
+se escapan del alcance de la tarea.
+
+Si bien queria agregar varios otros temas como mejor observabilidad, 
+tests en la pipeline, swagger dentro de la misma API, debido al poco
+tiempo personal para avanzar en la tarea y algunos problemas que me encontre
+con el setup de monorepo y de config de swagger no pude dejar cypress dentro
+del pipeline ni tampoco swagger funcionando automaticamente.
+
+Agregaria un poco mas de logging entre capas, pero considerando lo sencillo
+del caso de uso y la poca logica de negocio fuera de hace repository.doX
+no me hizo tanto sentido. Esto incluye tambien las configs de properties
+personales, agregando solo el demo al github y un gitignore al archivo que se usa realmente, para asi poder usar secrets y configurar diversos ambientes.
+
+Si bien cypress no quedo funcionando en el pipeline si quedaron algunos tests funcionando, pero solo se pueden correr de forma local. Para esto tambien existe un docker-compose y correspondientes Dockerfiles para levantar contenedores que levanten el front y el back. 
+
+
+
+
 ## Objetivos
 >Este desafío tiene como objetivo evaluar tus habilidades como desarrollador Fullstack, especialmente en Java, Spring Boot, Node.js, React, y principios de desarrollo de software. 
 
