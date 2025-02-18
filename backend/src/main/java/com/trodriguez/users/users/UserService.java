@@ -1,5 +1,6 @@
 package com.trodriguez.users.users;
 
+import com.trodriguez.users.passwords.PasswordService;
 import com.trodriguez.users.users.dto.UserDTO;
 import com.trodriguez.users.users.dto.UserRequestDTO;
 import com.trodriguez.users.users.exception.UserNotFoundException;
@@ -12,10 +13,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordService passwordService;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordService passwordService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordService = passwordService;
     }
 
     public List<UserDTO> getAllUsers() {
@@ -32,6 +35,11 @@ public class UserService {
 
     public UserDTO createUser(UserRequestDTO userRequest) {
         User user = userMapper.toEntity(userRequest);
+
+        String[] passwordData = passwordService.generateRandomPassword();
+        String hashedPassword = passwordData[1];
+
+        user.setPassword(hashedPassword);
         User savedUser = userRepository.save(user);
         return userMapper.toDTO(savedUser);
     }
